@@ -262,9 +262,17 @@ body.mopen{overflow:hidden}body.mopen .mo{opacity:1;pointer-events:auto}body.mop
 .pg{margin-right:calc((100% - 100vw)/2);padding-right:calc((100vw - 100%)/2)}
 .pg .pk{flex:0 0 min(340px,76vw);scroll-snap-align:start}.pg .pk.big{flex-basis:min(580px,80vw)}
 @media(hover:none),(max-width:700px){.ar{display:none}.fl{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none}.fl button{white-space:nowrap;flex:none}}
+.cruz .steps{counter-reset:s}.cruz .steps>div:before{counter-increment:s;content:"0" counter(s);display:block;font:500 38px/1 "Cormorant Garamond",Georgia,serif;color:var(--gold);margin-bottom:10px}
 @media(max-width:860px){
-.steps,.tg,.ig{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;gap:16px;padding-bottom:14px;scrollbar-width:none}
-.steps>div{flex:0 0 76vw;scroll-snap-align:start}.tg blockquote{flex:0 0 82vw;scroll-snap-align:start}.ig a{flex:0 0 62vw;scroll-snap-align:start}}
+.steps{grid-template-columns:1fr;gap:0;margin-top:30px}.steps>div{padding:22px 0 26px}.steps h3{font-size:26px}.steps p{font-size:16px}
+.tg{grid-template-columns:1fr;gap:14px}.tg blockquote{font-size:20px}
+.ig{grid-template-columns:1fr 1fr;gap:8px}.ig a{font-size:19px}}
+
+/* destaque no topo da vitrine */
+#dst{margin-top:34px}#dst[hidden]{display:none}
+#oth{font-size:clamp(26px,3.4vw,40px);margin:36px 0 0;max-width:none}
+#dst+#oth{margin-top:10px}
+@media(min-width:861px){#dst .pk.big:only-child{flex-basis:100%;display:grid;grid-template-columns:1.25fr 1fr}#dst .pk.big:only-child .ph{aspect-ratio:auto;min-height:400px}#dst .pk.big:only-child .pb{padding:36px;justify-content:center}#dst .pk.big:only-child h3{font-size:44px}}
 </style>
 </head>
 <body>
@@ -281,6 +289,8 @@ body.mopen{overflow:hidden}body.mopen .mo{opacity:1;pointer-events:auto}body.mop
 <small>Mais de 30 anos de experiência em turismo.</small></div></header>
 <section class="dest sec" id="viagens"><div class="wrap">
 <h2>Viagens em destaque</h2>
+<div class="pg" id="dst"></div>
+<h3 id="oth">Demais viagens</h3>
 <div class="fl" id="fl" role="group" aria-label="Filtrar por categoria"></div>
 <div class="sb"><input class="sr" id="q" type="search" placeholder="Buscar destino" aria-label="Buscar destino"><div class="ar"><button id="pv" aria-label="Viagens anteriores">‹</button><button id="nx" aria-label="Próximas viagens">›</button></div></div>
 <div class="pg" id="pg"></div>
@@ -338,8 +348,12 @@ var $=function(i){return document.getElementById(i)},cat=CATS[0],q="";
 function msg(n){return "Olá! Conheci o pacote "+n+" no site da Boutique do Turismo e gostaria de receber mais informações sobre valores, datas e disponibilidade."}
 function wa(n){var m=msg(n);return WA?"https://wa.me/"+WA+"?text="+encodeURIComponent(m):LINK}
 function preco(p){return p.preco?"R$ "+p.preco.toLocaleString("pt-BR")+"<em>por pessoa"+(p.parc?" · "+p.parc:"")+(p.demo?" · valor demonstrativo":"")+"</em>":"Consulte valores<em>sob consulta</em>"}
-function card(p){return '<article class="pk'+(p.destaque?' big':'')+'"><div class="ph" style="--a:'+p.a+';--b:'+p.b+(pimg(p)?';background-image:url('+pimg(p)+')':'')+'">'+(p.destaque?'<span class="bd">Viagem em destaque</span>':'')+'</div><div class="pb"><h3>'+(p.curto||p.nome)+'</h3><small>'+p.pais+'</small><p>'+p.desc+'</p><div class="meta">'+(p.dur?'<span>'+p.dur+'</span><span>Saída: '+p.saida+'</span>':'')+'</div><div class="pr">'+preco(p)+'</div><div class="ba"><a class="btn fill" href="#pacote-'+p.id+'">Ver detalhes</a><a class="btn dark" data-msg="'+(p.curto||p.nome)+'" href="#" target="_blank" rel="noopener">Consultar disponibilidade</a></div></div></article>'}
-function list(){var r=P.filter(function(p){return(cat==CATS[0]||p.tags.indexOf(cat)>-1)&&(p.nome+p.pais).toLowerCase().indexOf(q.toLowerCase())>-1});$("pg").innerHTML=r.length?r.map(card).join(""):"<p>Nenhuma viagem encontrada. Fale com nossa equipe para um roteiro sob medida.</p>"}
+function card(p,b){return '<article class="pk'+(b?' big':'')+'"><div class="ph" style="--a:'+p.a+';--b:'+p.b+(pimg(p)?';background-image:url('+pimg(p)+')':'')+'">'+(p.destaque?'<span class="bd">Viagem em destaque</span>':'')+'</div><div class="pb"><h3>'+(p.curto||p.nome)+'</h3><small>'+p.pais+'</small><p>'+p.desc+'</p><div class="meta">'+(p.dur?'<span>'+p.dur+'</span><span>Saída: '+p.saida+'</span>':'')+'</div><div class="pr">'+preco(p)+'</div><div class="ba"><a class="btn fill" href="#pacote-'+p.id+'">Ver detalhes</a><a class="btn dark" data-msg="'+(p.curto||p.nome)+'" href="#" target="_blank" rel="noopener">Consultar disponibilidade</a></div></div></article>'}
+function list(){var act=cat!=CATS[0]||q.trim()!="",f=P.filter(function(p){return p.destaque}),show=!act&&f.length>0;
+var r=P.filter(function(p){return(cat==CATS[0]||p.tags.indexOf(cat)>-1)&&(p.nome+p.pais).toLowerCase().indexOf(q.toLowerCase())>-1&&(act||!p.destaque)});
+$("dst").hidden=!show;$("dst").innerHTML=show?f.map(function(p){return card(p,true)}).join(""):"";
+$("oth").textContent=act?"Resultados da busca":(show?"Demais viagens":"Todas as viagens");
+$("pg").innerHTML=r.length?r.map(function(p){return card(p,false)}).join(""):"<p>Nenhuma viagem encontrada. Fale com nossa equipe para um roteiro sob medida.</p>"}
 function filters(){$("fl").innerHTML=CATS.map(function(c){return '<button class="'+(c==cat?'on':'')+'" aria-pressed="'+(c==cat)+'">'+c+'</button>'}).join("");[].forEach.call($("fl").children,function(b){b.onclick=function(){cat=b.textContent;filters();list()}})}
 function ul(a,c){return '<ul class="ck '+(c||'')+'">'+a.map(function(x){return "<li>"+x+"</li>"}).join("")+"</ul>"}
 function detail(id){var p=P.filter(function(x){return x.id==id})[0];if(!p){location.hash="#inicio";return}var n=p.curto||p.nome;
@@ -369,7 +383,7 @@ try{$("y").textContent=new Date().getFullYear()}catch(e){}
 <script>
 (function(){var C=window.SB;if(!C||!C.key||C.key.indexOf("COLE")==0)return;var H={apikey:C.key,Authorization:"Bearer "+C.key};
 function g(p){return fetch(C.url+"/rest/v1/"+p,{headers:H}).then(function(r){if(!r.ok)throw 0;return r.json()})}
-g("packages?select=data&status=eq.publicado&order=id").then(function(rs){if(!rs.length)return;P.length=0;rs.forEach(function(r){var p=r.data;p.tags=p.tags||[];P.push(p)});filters();list();wire();route()}).catch(function(){});
+g("packages?select=data&status=eq.publicado&order=id").then(function(rs){if(!rs.length)return;P.length=0;rs.forEach(function(r){var p=r.data;p.tags=p.tags||[];P.push(p)});P.sort(function(a,b){return(a.ordem||999)-(b.ordem||999)});filters();list();wire();route()}).catch(function(){});
 g("site_config?select=data&id=eq.site").then(function(r){var d=r[0]&&r[0].data;if(!d)return;if(d.wa)WA=String(d.wa).replace(/\D/g,"");if(d.endereco)[].forEach.call(document.querySelectorAll("address"),function(a){a.textContent=d.endereco});wire()}).catch(function(){})})();
 </script>
 <script>
