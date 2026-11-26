@@ -256,7 +256,7 @@ body.isadm nav,body.isadm footer,body.isadm .sticky{display:none!important}
 <p class="c">© <span id="y">2026</span> Boutique do Turismo by Camila. Todos os direitos reservados.</p></div></footer>
 <a class="btn sticky" id="st" data-msg="Boutique do Turismo" href="#" target="_blank" rel="noopener">Falar no WhatsApp</a>
 <div class="lb" id="lb" role="dialog" aria-modal="true"><button aria-label="Fechar">×</button><div id="lbi"></div></div>
-<div id="adm" hidden></div><div id="mdl"></div>
+
 <div class="toast" id="ts"></div>
 <script>
 /* ===== CONFIGURAÇÃO ===== */
@@ -311,69 +311,13 @@ var n=$("nav");function s(){n.classList.toggle("on",scrollY>60)}s();addEventList
 filters();list();wire();addEventListener("hashchange",route);route();
 try{$("y").textContent=new Date().getFullYear()}catch(e){}
 </script>
+
+<script src="config.js"></script>
 <script>
-(async function(){
-var BASE=JSON.parse(JSON.stringify(P)),$=function(i){return document.getElementById(i)},A=$("adm"),M=$("mdl");
-var DB=null,U=null,AS=null,ok=false,ready=false,me={name:"Administrador"},items=[],log=[],cfg={},media=null,tab="dash",sq="",sf="todos",so="nome",pg=0,cb=null;
-var TAGS=CATS.slice(1);
-function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]})}
-function toast(t){var e=$("ts");e.textContent=t;e.classList.add("on");setTimeout(function(){e.classList.remove("on")},3200)}
-function slug(s){return s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"")}
-function lines(s){return s.split("\n").map(function(x){return x.trim()}).filter(Boolean)}
-function fromDb(p){var o=Object.assign({},p);o.tags=p.tags||[];o.rot=(p.rot||[]).map(function(x){var a=x.split("||");return[a[0],a[1]||""]});["inc","nao","gal","rot"].forEach(function(k){if(!o[k]||!o[k].length)delete o[k]});return o}
-function toDb(p){var o=JSON.parse(JSON.stringify(p));o.status="publicado";o.demo=!!p.demo;o.destaque=!!p.destaque;if(p.rot)o.rot=p.rot.map(function(r){return r[0]+"||"+r[1]});return o}
-function find(id){return items.filter(function(x){return x.id==id})[0]}
-function L(t){return DB.collection("log").add({t:Date.now(),by:me.name||"",acao:t})}
-async function pub(){try{var c=await DB.doc("config/site").get();if(c.exists){var d=c.data();cfg=d;if(d.wa)WA=String(d.wa).replace(/\D/g,"");if(d.endereco)[].forEach.call(document.querySelectorAll("address"),function(a){a.textContent=d.endereco})}var s=await DB.collection("packages").get();if(!s.empty){var r=s.docs.map(function(x){return x.data()}).filter(function(p){return p.status=="publicado"}).map(fromDb);P.length=0;r.forEach(function(p){P.push(p)});filters();list();wire();route();aroute()}}catch(e){}}
-async function load(){var s=await DB.collection("packages").get();items=s.docs.map(function(d){return d.data()});var l=await DB.collection("log").orderBy("t","desc").limit(30).get();log=l.docs.map(function(d){return d.data()});var c=await DB.doc("config/site").get();cfg=c.exists?c.data():{}}
-function aroute(){var on=/^#admin/.test(location.hash);A.hidden=!on;document.body.classList.toggle("isadm",on);if(on){$("home").hidden=true;$("det").hidden=true;scrollTo(0,0);render()}}
-async function render(){if(!ready){A.innerHTML='<p class="ag">Verificando acesso…</p>';return}
-if(!ok){A.innerHTML='<div class="ag"><h2>Acesso restrito</h2><p>'+(DB?"Esta conta não tem permissão de edição nesta página. Abra o link com a conta dona da página.":"Não foi possível conectar ao banco de dados. Entre no claude.ai, abra o link direto no navegador (fora do chat) e aceite as permissões da página.")+'</p><a class="btn dark" href="#inicio">Voltar ao site</a></div>';return}
-A.innerHTML='<p class="ag">Carregando…</p>';try{await load();if(tab=="media"&&AS)media=await AS.list()}catch(e){A.innerHTML='<div class="ag"><p>Não foi possível carregar os dados. Tente de novo.</p></div>';return}shell()}
-function shell(){var T=[["dash","Dashboard"],["pk","Pacotes"],["media","Mídia"],["cfg","Configurações"],["log","Atividades"]];
-var h='<aside><img alt="Boutique do Turismo" src="'+document.querySelector("nav img").src+'">'+T.map(function(t){return'<button data-a="tab" data-t="'+t[0]+'" class="'+(tab==t[0]?"on":"")+'">'+t[1]+"</button>"}).join("")+'<a href="#inicio">Ver o site</a><a href="#inicio" data-a="out">Sair do painel</a></aside><main><header><h2>'+T.filter(function(t){return t[0]==tab})[0][1]+'</h2><span>'+esc(me.name)+" · administrador</span></header>";
-if(tab=="dash")h+=dash();else if(tab=="pk")h+=pkgs();else if(tab=="media")h+=mediaV();else if(tab=="cfg")h+=cfgV();else h+=logV();A.innerHTML=h+"</main>"}
-function dash(){var p=items.filter(function(x){return x.status=="publicado"}).length;return'<div class="cd"><div><b>'+items.length+"</b>pacotes cadastrados</div><div><b>"+p+"</b>publicados</div><div><b>"+(items.length-p)+'</b>em rascunho</div></div><div class="bx"><h3>Atalhos</h3><p style="margin:12px 0"><button class="btn fill" data-a="new">Novo pacote</button> <button class="btn dark" data-a="tab" data-t="pk">Gerenciar pacotes</button></p><h3 style="margin-top:20px">Atividades recentes</h3>'+(log.length?log.slice(0,5).map(function(l){return"<p>"+esc(l.acao)+" <small>— "+esc(l.by)+", "+new Date(l.t).toLocaleString("pt-BR")+"</small></p>"}).join(""):"<p>Nenhuma atividade ainda.</p>")+"</div>"}
-function pkgs(){var r=items.filter(function(p){return(sf=="todos"||p.status==sf)&&(p.nome+" "+p.pais).toLowerCase().indexOf(sq.toLowerCase())>-1});r.sort(function(a,b){return so=="preco"?(a.preco||0)-(b.preco||0):String(a.nome).localeCompare(b.nome)});var n=Math.ceil(r.length/8)||1;if(pg>=n)pg=n-1;
-var h='<div class="tools"><input id="sq" type="search" placeholder="Buscar pacote" value="'+esc(sq)+'"><select id="sf"><option value="todos">Todos</option><option value="publicado"'+(sf=="publicado"?" selected":"")+'>Publicados</option><option value="rascunho"'+(sf=="rascunho"?" selected":"")+'>Rascunhos</option></select><select id="so"><option value="nome">Ordenar por nome</option><option value="preco"'+(so=="preco"?" selected":"")+'>Ordenar por preço</option></select><button class="btn fill" data-a="new">Novo pacote</button></div>';
-if(!items.length)return h+'<div class="bx"><p>Nenhum pacote cadastrado ainda.</p><p style="margin-top:12px"><button class="btn dark" data-a="imp">Importar os pacotes atuais do site</button></p></div>';
-h+='<div class="bx"><table class="tb"><tr><th>Pacote</th><th>Destino</th><th>Preço</th><th>Status</th><th></th></tr>'+(r.length?r.slice(pg*8,pg*8+8).map(function(p){return"<tr><td>"+esc(p.curto||p.nome)+"</td><td>"+esc(p.pais)+"</td><td>"+(p.preco?"R$ "+Number(p.preco).toLocaleString("pt-BR"):"Consulte")+'</td><td><span class="st '+(p.status=="publicado"?"p":"")+'">'+esc(p.status)+'</span></td><td><button class="btn dark sm" data-a="edit" data-id="'+esc(p.id)+'">Editar</button><button class="btn dark sm" data-a="tog" data-id="'+esc(p.id)+'">'+(p.status=="publicado"?"Despublicar":"Publicar")+'</button><button class="btn dark sm" data-a="del" data-id="'+esc(p.id)+'">Excluir</button></td></tr>'}).join(""):'<tr><td colspan="5">Nada encontrado para este filtro.</td></tr>')+'</table><p style="margin-top:14px"><button class="btn dark sm" data-a="pp">‹</button> Página '+(pg+1)+" de "+n+' <button class="btn dark sm" data-a="pn">›</button></p></div>';return h}
-function mediaV(){if(!AS)return'<div class="bx"><p>O envio de arquivos está disponível só para editores.</p></div>';var a=media?media.assets:[];return'<div class="bx"><p><input type="file" id="up" accept="image/*"></p><p style="margin:12px 0;font-size:13px">Depois do envio, copie o endereço da imagem e cole no campo “Imagem principal” do pacote.</p><div class="mg">'+(a.length?a.map(function(m){return'<div><img alt="" src="'+esc(m.url)+'"><button class="btn dark sm" data-a="cp" data-u="'+esc(m.url)+'">Copiar endereço</button><button class="btn dark sm" data-a="dm" data-id="'+esc(m.id)+'">Excluir</button></div>'}).join(""):"<p>Nenhum arquivo enviado.</p>")+"</div></div>"}
-function cfgV(){return'<div class="bx fm" style="max-width:520px"><label>WhatsApp com DDI (somente números)</label><input id="c_wa" value="'+esc(cfg.wa||WA)+'"><label>Endereço</label><input id="c_end" value="'+esc(cfg.endereco||"")+'"><p style="margin-top:16px"><button class="btn fill" data-a="scfg">Salvar</button></p></div>'}
-function logV(){return'<div class="bx">'+(log.length?log.map(function(l){return"<p>"+esc(l.acao)+" <small>— "+esc(l.by)+", "+new Date(l.t).toLocaleString("pt-BR")+"</small></p>"}).join(""):"<p>Nenhuma atividade registrada.</p>")+"</div>"}
-function F(l,i,v,t){return"<label>"+l+'</label><input id="'+i+'" type="'+(t||"text")+'" value="'+esc(v)+'">'}
-function TA(l,i,v,h){return"<label>"+l+'</label><textarea id="'+i+'" rows="'+(h||3)+'">'+esc(v)+"</textarea>"}
-function form(id){var p=id?find(id):{tags:[],status:"rascunho",a:"#c9a850",b:"#3b2a22"};
-M.innerHTML='<div class="mb"><div class="mc" role="dialog" aria-modal="true"><h3>'+(id?"Editar pacote":"Novo pacote")+"</h3>"+F("Nome do pacote *","f_nome",p.nome||"")+'<div class="row2"><div>'+F("Nome curto","f_curto",p.curto||"")+"</div><div>"+F("País ou região *","f_pais",p.pais||"")+'</div></div><label>Categorias *</label><div class="ck2">'+TAGS.map(function(t){return'<label><input type="checkbox" class="tg_" value="'+t+'"'+(p.tags.indexOf(t)>-1?" checked":"")+">"+t+"</label>"}).join("")+'</div><div class="row2"><div>'+F("Duração","f_dur",p.dur||"")+"</div><div>"+F("Data de saída","f_saida",p.saida||"")+'</div><div>'+F("Preço por pessoa (R$)","f_preco",p.preco||"","number")+"</div><div>"+F("Parcelamento","f_parc",p.parc||"")+"</div><div>"+F("Cor 1","f_a",p.a||"#c9a850","color")+"</div><div>"+F("Cor 2","f_b",p.b||"#3b2a22","color")+"</div></div>"+F("Frase de apoio","f_sub",p.sub||"")+TA("Descrição","f_desc",p.desc||"")+F("Imagem principal (endereço)","f_img",p.img||"")+TA("Incluso (um por linha)","f_inc",(p.inc||[]).join("\n"))+TA("Não incluso (um por linha)","f_nao",(p.nao||[]).join("\n"))+TA("Roteiro (Título :: descrição, uma linha por dia)","f_rot",(p.rot||[]).map(function(x){return x.replace("||"," :: ")}).join("\n"),4)+TA("Galeria (um título por linha)","f_gal",(p.gal||[]).join("\n"))+'<div class="ck2"><label><input type="checkbox" id="f_demo"'+(p.demo?" checked":"")+'>Preço demonstrativo</label><label><input type="checkbox" id="f_dest"'+(p.destaque?" checked":"")+'>Destaque</label><label>Status <select id="f_st"><option value="rascunho">Rascunho</option><option value="publicado"'+(p.status=="publicado"?" selected":"")+'>Publicado</option></select></label></div><div class="er" id="fe"></div><p style="margin-top:18px"><button class="btn fill" data-a="save" data-id="'+esc(id||"")+'">Salvar</button> <button class="btn dark" data-a="x">Cancelar</button></p></div></div>'}
-function confirmM(t,fn){cb=fn;M.innerHTML='<div class="mb"><div class="mc" style="max-width:420px"><p>'+esc(t)+'</p><p style="margin-top:18px"><button class="btn fill" data-a="yes">Confirmar</button> <button class="btn dark" data-a="x">Cancelar</button></p></div></div>'}
-function v(i){return $(i).value}
-async function save(id){var nome=v("f_nome").trim(),pais=v("f_pais").trim(),pr=v("f_preco").trim(),tags=[].map.call(M.querySelectorAll(".tg_:checked"),function(x){return x.value}),er=[];
-if(!nome)er.push("Informe o nome.");if(!pais)er.push("Informe o país ou região.");if(!tags.length)er.push("Escolha ao menos uma categoria.");if(pr&&!(Number(pr)>=0))er.push("Preço inválido.");
-var nid=id||slug(nome);if(!nid)er.push("Nome inválido.");if(!id&&find(nid))er.push("Já existe um pacote com este nome.");
-if(er.length){$("fe").textContent=er.join(" ");return}
-var o={id:nid,nome:nome,curto:v("f_curto").trim(),pais:pais,tags:tags,dur:v("f_dur").trim(),saida:v("f_saida").trim(),parc:v("f_parc").trim(),sub:v("f_sub").trim(),desc:v("f_desc").trim(),a:v("f_a"),b:v("f_b"),img:v("f_img").trim(),demo:$("f_demo").checked,destaque:$("f_dest").checked,status:v("f_st"),inc:lines(v("f_inc")),nao:lines(v("f_nao")),rot:lines(v("f_rot")).map(function(l){return l.replace("::","||")}),gal:lines(v("f_gal"))};
-if(pr)o.preco=Number(pr);
-try{await DB.doc("packages/"+nid).set(o);await L((id?"Editou ":"Criou ")+nome);M.innerHTML="";toast("Pacote salvo.");await pub();render()}catch(e){$("fe").textContent="Não foi possível salvar. Você precisa ter permissão de edição."}}
-document.addEventListener("click",async function(e){var b=e.target.closest("[data-a]");if(!b)return;var a=b.dataset.a,id=b.dataset.id;if(a=="x"){M.innerHTML="";return}if(a=="out"){return}if(!ok)return;
-try{if(a=="tab"){tab=b.dataset.t;pg=0;render()}else if(a=="new")form();else if(a=="edit")form(id);else if(a=="save")save(id);
-else if(a=="pp"){pg=Math.max(0,pg-1);shell()}else if(a=="pn"){pg++;shell()}
-else if(a=="tog"){var p=find(id),np=p.status=="publicado"?"rascunho":"publicado";await DB.doc("packages/"+id).update({status:np});await L((np=="publicado"?"Publicou ":"Despublicou ")+p.nome);toast("Status atualizado.");await pub();render()}
-else if(a=="del"){var q=find(id);confirmM("Excluir “"+q.nome+"”? Esta ação não pode ser desfeita.",async function(){await DB.doc("packages/"+id).delete();await L("Excluiu "+q.nome);toast("Pacote excluído.");await pub();if(!items.length||true){var s=await DB.collection("packages").get();if(s.empty){P.length=0;BASE.forEach(function(x){P.push(x)});filters();list()}}render()})}
-else if(a=="yes"){M.innerHTML="";if(cb)await cb()}
-else if(a=="imp"){for(var i=0;i<BASE.length;i++)await DB.doc("packages/"+BASE[i].id).set(toDb(BASE[i]));await L("Importou os pacotes atuais");toast("Pacotes importados.");await pub();render()}
-else if(a=="scfg"){var w=v("c_wa").replace(/\D/g,"");if(w&&w.length<12){toast("Informe o número com DDI e DDD.");return}await DB.doc("config/site").set({wa:w,endereco:v("c_end").trim()});await L("Alterou as configurações");toast("Configurações salvas.");await pub();render()}
-else if(a=="cp"){try{await navigator.clipboard.writeText(b.dataset.u);toast("Endereço copiado.")}catch(x){toast(b.dataset.u)}}
-else if(a=="dm"){confirmM("Excluir este arquivo para sempre?",async function(){await AS.delete(id);toast("Arquivo excluído.");render()})}
-}catch(x){toast("Ação não concluída. Verifique sua permissão de edição.")}});
-document.addEventListener("input",function(e){if(e.target.id=="sq"){sq=e.target.value;pg=0;var c=e.target.selectionStart;shell();var n=$("sq");n.focus();n.setSelectionRange(c,c)}});
-document.addEventListener("change",async function(e){if(e.target.id=="sf"){sf=e.target.value;pg=0;shell()}else if(e.target.id=="so"){so=e.target.value;shell()}else if(e.target.id=="up"&&e.target.files[0]){try{await AS.upload(e.target.files[0]);await L("Enviou um arquivo de mídia");toast("Arquivo enviado.");render()}catch(x){toast("Falha no envio.")}}});
-addEventListener("hashchange",aroute);
-aroute();
-try{if(window.claude){DB=await claude.use("db");U=await claude.use("user");AS=await claude.use("assets")}}catch(e){}
-if(DB)await pub();
-try{ok=!!(DB&&U&&await U.canEdit());if(ok)me=await U.me()}catch(e){ok=false}
-ready=true;aroute();
-})();
+(function(){var C=window.SB;if(!C||!C.key||C.key.indexOf("COLE")==0)return;var H={apikey:C.key,Authorization:"Bearer "+C.key};
+function g(p){return fetch(C.url+"/rest/v1/"+p,{headers:H}).then(function(r){if(!r.ok)throw 0;return r.json()})}
+g("packages?select=data&status=eq.publicado&order=id").then(function(rs){if(!rs.length)return;P.length=0;rs.forEach(function(r){var p=r.data;p.tags=p.tags||[];P.push(p)});filters();list();wire();route()}).catch(function(){});
+g("site_config?select=data&id=eq.site").then(function(r){var d=r[0]&&r[0].data;if(!d)return;if(d.wa)WA=String(d.wa).replace(/\D/g,"");if(d.endereco)[].forEach.call(document.querySelectorAll("address"),function(a){a.textContent=d.endereco});wire()}).catch(function(){})})();
 </script>
 </body>
 </html>
