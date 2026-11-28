@@ -273,6 +273,25 @@ body.mopen{overflow:hidden}body.mopen .mo{opacity:1;pointer-events:auto}body.mop
 #oth{font-size:clamp(26px,3.4vw,40px);margin:36px 0 0;max-width:none}
 #dst+#oth{margin-top:10px}
 @media(min-width:861px){#dst .pk.big:only-child{flex-basis:100%;display:grid;grid-template-columns:1.25fr 1fr}#dst .pk.big:only-child .ph{aspect-ratio:auto;min-height:400px}#dst .pk.big:only-child .pb{padding:36px;justify-content:center}#dst .pk.big:only-child h3{font-size:44px}}
+
+/* telefone: destaques encaixam, demais viagens na vertical, seções mais compactas */
+@media(max-width:700px){
+#dst{scroll-snap-type:x mandatory;scroll-padding-left:4px;overscroll-behavior-x:contain}
+#dst .pk,#dst .pk.big{flex:0 0 86vw;scroll-snap-align:start;scroll-snap-stop:always}
+#pg{flex-direction:column;overflow:visible;margin-right:0;padding:4px 0 8px;gap:16px;scroll-snap-type:none}
+#pg .pk{flex:none;width:100%}
+#pg .ph{aspect-ratio:16/9}#pg .pb{padding:16px;gap:4px}#pg .pb h3{font-size:26px}
+#pg .pb p{font-size:14px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;margin:2px 0 4px}
+#pg .pr{font-size:30px;margin-top:4px}
+#oth{margin-top:26px;font-size:28px}
+.sec{padding:48px 0}h2{font-size:30px}
+.steps{margin-top:18px}.steps>div{padding:14px 0 16px}.steps h3{font-size:22px}.steps p{font-size:15px;line-height:1.5;margin-top:4px}
+.cruz .steps>div:before{font-size:26px;margin-bottom:2px}
+.tg{margin-top:24px;gap:10px}.tg blockquote{padding:16px 18px;font-size:18px}.tg cite{margin-top:8px;font-size:12px}
+.ig{margin:22px 0 20px;gap:6px}.ig a{font-size:16px;padding:10px}
+.contact p{font-size:17px;margin:14px auto 24px}.contact address{margin-top:24px}
+footer{padding-top:44px}
+}
 </style>
 </head>
 <body>
